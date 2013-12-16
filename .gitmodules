@@ -1,0 +1,3 @@
+[submodule "src/github.com/robmerrell/comandante"]
+	path = src/github.com/robmerrell/comandante
+	url = git@github.com:robmerrell/comandante.git
