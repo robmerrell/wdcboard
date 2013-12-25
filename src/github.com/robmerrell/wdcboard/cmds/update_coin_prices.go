@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	"github.com/robmerrell/peerdash/updaters"
+	"github.com/robmerrell/wdcboard/updaters"
 )
 
 var UpdateCoinPricesDoc = `

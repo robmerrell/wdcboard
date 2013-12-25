@@ -12,7 +12,7 @@ type Price struct {
 
 var priceCollection = "prices"
 
-// InsertPrice create new PPC price points
+// InsertPrice creates new WDC price points
 func InsertPrice(conn *MgoConnection, usd, btc float64) error {
 	price := &Price{
 		Usd:       usd,

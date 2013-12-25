@@ -3,16 +3,16 @@ package updaters
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/robmerrell/peerdash/models"
+	"github.com/robmerrell/wdcboard/models"
 	"io/ioutil"
 	"net/http"
 )
 
-var tickerUrl = "https://btc-e.com/api/2/ppc_%s/ticker"
+var tickerUrl = "https://btc-e.com/api/2/wdc_%s/ticker"
 
 type CoinPrice struct{}
 
-// Update retrieves PPC buy prices in both USD and BTC and saves
+// Update retrieves WDC buy prices in both USD and BTC and saves
 // the prices to the database.
 func (c *CoinPrice) Update() error {
 	usd, err := getQuoteCurrencyValue("usd")
@@ -31,8 +31,7 @@ func (c *CoinPrice) Update() error {
 }
 
 // getQuoteCurrencyValue gets the current buy price for a given
-// quote currency. At the moment BTC-e only supports USD and BTC
-// for PPC trades.
+// quote currency.
 func getQuoteCurrencyValue(quoteCurrency string) (float64, error) {
 	resp, err := http.Get(fmt.Sprintf(tickerUrl, quoteCurrency))
 	if err != nil {

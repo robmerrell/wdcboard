@@ -3,17 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/robmerrell/comandante"
-	"github.com/robmerrell/peerdash/cmds"
-	"github.com/robmerrell/peerdash/config"
-	"github.com/robmerrell/peerdash/models"
-	"github.com/robmerrell/peerdash/updaters"
+	"github.com/robmerrell/wdcboard/cmds"
+	"github.com/robmerrell/wdcboard/config"
+	"github.com/robmerrell/wdcboard/models"
+	"github.com/robmerrell/wdcboard/updaters"
 	"os"
 )
 
 func main() {
 	// get the environment for the config
 	appEnv := ""
-	env := os.Getenv("PEERDASH_ENV")
+	env := os.Getenv("WDCBOARD_ENV")
 	switch env {
 	case "dev", "test", "prod":
 		appEnv = env
@@ -30,15 +30,15 @@ func main() {
 	}
 	defer models.CloseDB()
 
-	bin := comandante.New("peerdash", "Peercoin dashboard")
+	bin := comandante.New("wdcboard", "Worldcoin dashboard")
 	bin.IncludeHelp()
 
 	// setup (database, indexes)
 
 	// run web service
 
-	// update peercoin prices
-	updateCoinPrices := comandante.NewCommand("update_coin_prices", "Get updated peercoin prices", cmds.UpdateAction(&updaters.CoinPrice{}))
+	// update worldcoin prices
+	updateCoinPrices := comandante.NewCommand("update_coin_prices", "Get updated worldcoin prices", cmds.UpdateAction(&updaters.CoinPrice{}))
 	updateCoinPrices.Documentation = cmds.UpdateCoinPricesDoc
 	bin.RegisterCommand(updateCoinPrices)
 
