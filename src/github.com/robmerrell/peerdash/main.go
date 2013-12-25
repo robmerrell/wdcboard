@@ -4,14 +4,27 @@ import (
 	"fmt"
 	"github.com/robmerrell/comandante"
 	"github.com/robmerrell/peerdash/cmds"
+	"github.com/robmerrell/peerdash/config"
 	"github.com/robmerrell/peerdash/models"
 	"github.com/robmerrell/peerdash/updaters"
 	"os"
 )
 
 func main() {
+	// get the environment for the config
+	appEnv := ""
+	env := os.Getenv("PEERDASH_ENV")
+	switch env {
+	case "dev", "test", "prod":
+		appEnv = env
+	default:
+		appEnv = "dev"
+	}
+
+	config.LoadConfig(appEnv)
+
 	// make the package level database connection
-	if err := models.ConnectToDB("localhost", "peerdash"); err != nil {
+	if err := models.ConnectToDB(config.String("database.host"), config.String("database.db")); err != nil {
 		fmt.Fprintln(os.Stderr, "Could not connect to the database")
 		os.Exit(1)
 	}
@@ -29,13 +42,9 @@ func main() {
 	updateCoinPrices.Documentation = cmds.UpdateCoinPricesDoc
 	bin.RegisterCommand(updateCoinPrices)
 
-	// update peercoin_talk stories
+	// update forum posts
 
 	// update reddit stories
-
-	// update latest tweets
-
-	// update marketcap
 
 	// update network info
 
