@@ -1,3 +1,6 @@
 [submodule "src/github.com/robmerrell/comandante"]
 	path = src/github.com/robmerrell/comandante
 	url = git@github.com:robmerrell/comandante.git
+[submodule "src/github.com/pelletier/go-toml"]
+	path = src/github.com/pelletier/go-toml
+	url = git@github.com:pelletier/go-toml.git
