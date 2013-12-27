@@ -8,12 +8,11 @@ import (
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
 
-type configSuite struct {}
+type configSuite struct{}
 
 var _ = Suite(&configSuite{})
 
 func (s *configSuite) SetUpSuite(c *C) {
-	basePath = "."
 	LoadConfig("testconfig")
 }
 
