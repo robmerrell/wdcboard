@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/robmerrell/wdcboard/config"
 	"labix.org/v2/mgo"
 )
 
@@ -51,5 +52,21 @@ func CloneConnection() *MgoConnection {
 		Session: cloned,
 		DB:      cloned.DB(mainConnection.DBName),
 		DBName:  mainConnection.DBName,
+	}
+}
+
+// DropCollection drops all collections in the database. For this function to
+// work the config environment must be set to "test".
+func DropCollections() {
+	if config.String("env") != "test" {
+		panic("DropCollections only works in the test environment")
+	}
+
+	conn := CloneConnection()
+	defer conn.Close()
+
+	collections := []string{priceCollection}
+	for _, collection := range collections {
+		conn.DB.C(collection).DropCollection()
 	}
 }

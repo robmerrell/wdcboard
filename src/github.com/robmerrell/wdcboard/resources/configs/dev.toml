@@ -1,3 +1,5 @@
+env = "dev"
+
 [database]
 host = "localhost"
 db = "wdcboard"
