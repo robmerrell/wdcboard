@@ -33,20 +33,23 @@ func main() {
 	bin := comandante.New("wdcboard", "Worldcoin dashboard")
 	bin.IncludeHelp()
 
-	// setup (database, indexes)
-
-	// run web service
+	// add indexes to the database
+	addIndexes := comandante.NewCommand("index", "Add indexes to the database", cmds.IndexAction)
+	addIndexes.Documentation = cmds.IndexDoc
+	bin.RegisterCommand(addIndexes)
 
 	// update worldcoin prices
 	updateCoinPrices := comandante.NewCommand("update_coin_prices", "Get updated worldcoin prices", cmds.UpdateAction(&updaters.CoinPrice{}))
 	updateCoinPrices.Documentation = cmds.UpdateCoinPricesDoc
 	bin.RegisterCommand(updateCoinPrices)
 
+	// update network info
+
+	// run web service
+
 	// update forum posts
 
 	// update reddit stories
-
-	// update network info
 
 	if err := bin.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
