@@ -23,8 +23,7 @@ var priceCollection = "prices"
 
 // Insert saves a new WDC price point to the database.
 func (p *Price) Insert(conn *MgoConnection) error {
-	err := conn.DB.C(priceCollection).Insert(p)
-	return err
+	return conn.DB.C(priceCollection).Insert(p)
 }
 
 // SetPercentChange adds the percent change from the last 24 hours for all exchanges.

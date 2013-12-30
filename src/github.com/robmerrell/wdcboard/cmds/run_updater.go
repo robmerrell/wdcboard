@@ -5,8 +5,11 @@ import (
 )
 
 var UpdateCoinPricesDoc = `
-Get updated USD and BTC buy prices from the btc-e.com api save them
-to the database.
+Get updated USD and BTC buy prices from multiple exchange apis.
+`
+
+var UpdateNetworkDoc = `
+Get updated information about the Worldcoin network.
 `
 
 // UpdateAction returns a function that invokes an updaters Update method

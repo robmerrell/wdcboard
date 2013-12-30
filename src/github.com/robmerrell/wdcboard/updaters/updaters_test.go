@@ -55,7 +55,7 @@ func (s *coinPriceSuite) TearDownSuite(c *C) {
 	s.badServer.Close()
 }
 
-func replaceQuoteUrl(newUrl string, val *string, testFunc func()) {
+func replaceUrl(newUrl string, val *string, testFunc func()) {
 	oldUrl := *val
 	*val = newUrl
 
@@ -65,23 +65,23 @@ func replaceQuoteUrl(newUrl string, val *string, testFunc func()) {
 }
 
 func (s *coinPriceSuite) TestTradePrices(c *C) {
-	replaceQuoteUrl(s.coinBaseServer.URL, &coinbaseUrl, func() {
+	replaceUrl(s.coinBaseServer.URL, &coinbaseUrl, func() {
 		value, _ := coinbaseQuote()
 		c.Check(value, Equals, 676.58046)
 	})
 
-	replaceQuoteUrl(s.badServer.URL, &coinbaseUrl, func() {
+	replaceUrl(s.badServer.URL, &coinbaseUrl, func() {
 		value, err := coinbaseQuote()
 		c.Check(value, Equals, 0.0)
 		c.Assert(err, NotNil)
 	})
 
-	replaceQuoteUrl(s.cryptsyServer.URL, &cryptsyUrl, func() {
+	replaceUrl(s.cryptsyServer.URL, &cryptsyUrl, func() {
 		value, _ := cryptsyQuote()
 		c.Check(value, Equals, 0.00053275)
 	})
 
-	replaceQuoteUrl(s.badServer.URL, &cryptsyUrl, func() {
+	replaceUrl(s.badServer.URL, &cryptsyUrl, func() {
 		value, err := cryptsyQuote()
 		c.Check(value, Equals, 0.0)
 		c.Assert(err, NotNil)
@@ -89,8 +89,8 @@ func (s *coinPriceSuite) TestTradePrices(c *C) {
 }
 
 func (s *coinPriceSuite) TestSavingPrices(c *C) {
-	replaceQuoteUrl(s.coinBaseServer.URL, &coinbaseUrl, func() {
-		replaceQuoteUrl(s.cryptsyServer.URL, &cryptsyUrl, func() {
+	replaceUrl(s.coinBaseServer.URL, &coinbaseUrl, func() {
+		replaceUrl(s.cryptsyServer.URL, &cryptsyUrl, func() {
 			conn := models.CloneConnection()
 			defer conn.Close()
 
@@ -103,5 +103,74 @@ func (s *coinPriceSuite) TestSavingPrices(c *C) {
 			c.Check(saved.UsdPerBtc, Equals, 676.58046)
 			c.Check(saved.Cryptsy.Btc, Equals, 0.00053275)
 		})
+	})
+}
+
+// ---------------------------------
+// Tests for retrieving network info
+// ---------------------------------
+type networkSuite struct {
+	hashRateServer   *httptest.Server
+	difficultyServer *httptest.Server
+	minedServer      *httptest.Server
+	blockcountServer *httptest.Server
+}
+
+var _ = Suite(&networkSuite{})
+
+func (s *networkSuite) SetUpSuite(c *C) {
+	s.hashRateServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := "6792543827"
+		fmt.Fprintln(w, res)
+	}))
+
+	s.difficultyServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := "42.177"
+		fmt.Fprintln(w, res)
+	}))
+
+	s.minedServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := "37755394.06249219"
+		fmt.Fprintln(w, res)
+	}))
+
+	s.blockcountServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := "915281"
+		fmt.Fprintln(w, res)
+	}))
+}
+
+func (s *networkSuite) SetUpTest(c *C) {
+	config.LoadConfig("test")
+	models.ConnectToDB(config.String("database.host"), config.String("database.db"))
+	models.DropCollections()
+}
+
+func (s *networkSuite) TearDownSuite(c *C) {
+	s.hashRateServer.Close()
+	s.difficultyServer.Close()
+	s.minedServer.Close()
+	s.blockcountServer.Close()
+}
+
+func (s *networkSuite) TestNetworkCalls(c *C) {
+	replaceUrl(s.hashRateServer.URL, &networkBaseUrl, func() {
+		value, _ := getHashRate()
+		c.Check(value, Equals, "6792.54")
+	})
+
+	replaceUrl(s.difficultyServer.URL, &networkBaseUrl, func() {
+		value, _ := getDifficulty()
+		c.Check(value, Equals, "42.177")
+	})
+
+	replaceUrl(s.minedServer.URL, &networkBaseUrl, func() {
+		value, _ := getMined()
+		c.Check(value, Equals, "37755394")
+	})
+
+	replaceUrl(s.blockcountServer.URL, &networkBaseUrl, func() {
+		value, _ := getBlockCount()
+		c.Check(value, Equals, "915281")
 	})
 }

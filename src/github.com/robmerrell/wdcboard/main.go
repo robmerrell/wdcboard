@@ -44,12 +44,15 @@ func main() {
 	bin.RegisterCommand(updateCoinPrices)
 
 	// update network info
-
-	// run web service
+	updateNetwork := comandante.NewCommand("update_network", "Get updated network information", cmds.UpdateAction(&updaters.Network{}))
+	updateNetwork.Documentation = cmds.UpdateCoinPricesDoc
+	bin.RegisterCommand(updateNetwork)
 
 	// update forum posts
 
 	// update reddit stories
+
+	// run web service
 
 	if err := bin.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
