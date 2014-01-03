@@ -4,3 +4,12 @@
 [submodule "src/github.com/pelletier/go-toml"]
 	path = src/github.com/pelletier/go-toml
 	url = git@github.com:pelletier/go-toml.git
+[submodule "src/github.com/codegangsta/martini"]
+	path = src/github.com/codegangsta/martini
+	url = git://github.com/codegangsta/martini.git
+[submodule "src/github.com/codegangsta/inject"]
+	path = src/github.com/codegangsta/inject
+	url = git://github.com/codegangsta/inject.git
+[submodule "src/github.com/hoisie/mustache"]
+	path = src/github.com/hoisie/mustache
+	url = git://github.com/hoisie/mustache.git

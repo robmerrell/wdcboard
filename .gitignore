@@ -1,3 +1,4 @@
 .DS_Store
 pkg/*
-src/github.com/robmerrell/peerdash/peerdash
+*.swp
+src/github.com/robmerrell/wdcboard/wdcboard

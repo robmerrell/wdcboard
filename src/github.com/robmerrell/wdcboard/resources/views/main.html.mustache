@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WDCBoard</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+
+  <body>
+    <header class="pure-g-r">
+      <div class="pure-u-1-2 logo">
+        Worldcoin dashboard
+      </div>
+
+      <div class="pure-u-1-2 donate">
+        Please consider donating if you find this site useful: WhQs9bCLhgE8A4os8hc4nDLHo8s58BBvLk 
+      </div>
+    </header>
+
+    <div class="wrapper">
+      <section class="pure-g-r">
+        <div class="pure-u-1-4">
+          <div class="stat-box usd-stat">
+            <div class="stat-title">
+              USD
+            </div>
+
+            <div class="stat-value">
+              ${{usd}}
+            </div>
+          </div>
+        </div>
+
+        <div class="pure-u-1-4">
+          <div class="stat-box gray-stat">
+            <div class="stat-title">
+              BTC
+            </div>
+
+            <div class="stat-value">
+              {{btc}}
+            </div>
+          </div>
+        </div>
+
+        <div class="pure-u-1-4">
+          <div class="stat-box gray-stat">
+            <div class="stat-title">
+              MARKET CAP (USD)
+            </div>
+
+            <div class="stat-value">
+              ${{marketCap}}
+            </div>
+          </div>
+        </div>
+
+        <div class="pure-u-1-4">
+          <div class="stat-box {{changeStyle}}">
+            <div class="stat-title">
+              24 HOUR CHANGE
+            </div>
+
+            <div class="stat-value">
+              {{change}}%
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-title">24 HOURS</div>
+        <canvas id="priceChart"></canvas>
+      </section>
+
+      <section>
+        <div class="section-title">DISCUSSION</div>
+        <div class="pure-g-r">
+          <div class="pure-u-1-2">
+            <div class="news-title">
+              Worldcoin Forum
+            </div>
+            <ul class="news-body">
+              <li><a href="http://worldcoinforum.org/topic/852-exposing-the-worldcoin-scam/">"Exposing the WorldCoin scam?"</a></li>
+              <li><a href="http://worldcoinforum.org/topic/951-new-wallet-translate-mistake/">New Wallet Translate Mistake</a></li>
+              <li><a href="http://worldcoinforum.org/topic/971-worldcoin-video-chat-irc/">WorldCoin Video Chat + IRC</a></li>
+              <li><a href="http://worldcoinforum.org/topic/628-solution-to-slow-initial-blockchain-sync/">SOLUTION TO SLOW INITIAL BLOCKCHAIN SYNC</a></li>
+              <li><a href="http://worldcoinforum.org/topic/967-why-the-worldcoin-dont-create-block-at-my-pool-when-run-half-day/">why the worldcoin don't create block at my pool when run half day?</a></li>
+            </ul>
+          </div>
+
+          <div class="pure-u-1-2">
+            <div class="news-title">
+              /r/worldcoin
+            </div>
+            <ul class="news-body">
+              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tm13z/where_can_i_buy_wdc/">Where can I buy WDC</a></li>
+              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tklxp/paper_wallet_generator_secure/">Paper Wallet Generator Secure?</a></li>
+              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tjdz1/started_putting_together_some_css_for_rworldcoin/">Started putting together some CSS for /r/Worldcoin. Check it out.</a></li>
+              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tjh59/cryptowisdom_keeps_you_up_to_date_with_the_latest/">CryptoWisdom keeps you up to date with the latest Cryptocurrency and Mining News!</a></li>
+              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tk953/what_value_do_you_think_a_single_worldcoin_would/">What value do you think a single Worldcoin would have to be to be useful in everyday purchases?</a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section style="border: none;">
+        <div class="section-title">MINING</div>
+        <div class="pure-g-r">
+          <div class="pure-u-1-4">
+            <div class="stat-box mining-stat">
+              <div class="stat-title">
+                NETWORK HASHRATE
+              </div>
+
+              <div class="stat-value">
+                {{hashRate}}
+              </div>
+            </div>
+          </div>
+
+          <div class="pure-u-1-4">
+            <div class="stat-box mining-stat">
+              <div class="stat-title">
+                DIFFICULTY
+              </div>
+
+              <div class="stat-value">
+                {{difficulty}}
+              </div>
+            </div>
+          </div>
+
+          <div class="pure-u-1-4">
+            <div class="stat-box mining-stat">
+              <div class="stat-title">
+                TOTAL MINED 
+              </div>
+
+              <div class="stat-value">
+                {{mined}}
+              </div>
+            </div>
+          </div>
+
+          <div class="pure-u-1-4">
+            <div class="stat-box mining-stat">
+              <div class="stat-title">
+                REMAINING COINS TO MINE
+              </div>
+
+              <div class="stat-value">
+                {{remaining}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="/js/chart.min.js"></script>
+    <script>
+      // load the chart
+      var ctx = document.getElementById("priceChart").getContext("2d");
+      var data = {
+        labels : ["0:00am", "3:00am", "6:00am", "9:00am", "12:00pm", "3:00pm", "6:00pm", "9:00pm"],
+        datasets : [
+          {
+            fillColor : "rgba(2,99,176,0.5)",
+            strokeColor : "rgba(2,99,176,1)",
+            pointColor : "rgba(151,187,205,1)",
+            pointStrokeColor : "#fff",
+            data : [0.38,0.37,0.39,0.40,0.41,0.39,0.38,0.41]
+          }
+        ]
+      };
+      var max = 0.41;
+      var steps = 0.02;
+      var options = {
+        bezierCurve: false,
+        scaleOverride: true,
+        scaleOverlay: true,
+        scaleSteps: 5,
+        scaleStepWidth: 0.05,
+        scaleStartValue: 0.27
+      };
+
+      function resizeChart() {
+          var canvas = document.getElementById("priceChart");
+
+          //set new sizes                 
+          var new_canvasWidth = Math.max((canvas.parentNode.clientWidth), 200);
+          var new_canvasHeight = 450;
+
+          //only redraw if the size  has changed
+          if ((new_canvasWidth != canvas.width) || (new_canvasHeight != canvas.height)) {
+              canvas.width = new_canvasWidth;
+              canvas.height = new_canvasHeight;
+              new Chart(canvas.getContext("2d")).Line(data, options);
+          }
+      }
+      //resizeTracker, clearTimeout, and setTimeout are used to only fire the resize event after the user has finished resizing; rather than firing lots of times unnecessarily while resizing.
+      var resizeTracker;
+      window.addEventListener('resize', (function(){clearTimeout(resizeTracker);resizeTracker = setTimeout(resizeChart, 100);}), false);
+      resizeChart();
+      
+    </script>
+
+  </body>
+</html>

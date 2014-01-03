@@ -21,6 +21,13 @@ type Price struct {
 
 var priceCollection = "prices"
 
+// GetLatestPrice gets the latest pricing information
+func GetLatestPrice(conn *MgoConnection) (*Price, error) {
+	var price *Price
+	err := conn.DB.C(priceCollection).Find(bson.M{}).Sort("-_id").One(&price)
+	return price, err
+}
+
 // Insert saves a new WDC price point to the database.
 func (p *Price) Insert(conn *MgoConnection) error {
 	return conn.DB.C(priceCollection).Insert(p)

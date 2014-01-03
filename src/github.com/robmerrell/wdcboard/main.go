@@ -53,6 +53,9 @@ func main() {
 	// update reddit stories
 
 	// run web service
+	webService := comandante.NewCommand("serve", "Start the WDCBoard web server", cmds.ServeAction)
+	webService.Documentation = cmds.ServerDoc
+	bin.RegisterCommand(webService)
 
 	if err := bin.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
