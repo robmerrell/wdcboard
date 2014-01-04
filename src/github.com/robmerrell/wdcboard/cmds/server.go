@@ -3,6 +3,7 @@ package cmds
 import (
 	"github.com/codegangsta/martini"
 	"github.com/hoisie/mustache"
+	"github.com/robmerrell/wdcboard/lib"
 	"github.com/robmerrell/wdcboard/models"
 	"log"
 	"net/http"
@@ -83,16 +84,16 @@ func generateTplVars(price *models.Price, network *models.Network) map[string]st
 	remainingCoins := 265420800 - minedNum
 
 	vars := map[string]string{
-		"usd":         strconv.FormatFloat(price.Cryptsy.Usd, 'f', 2, 64),
+		"usd":         lib.RenderFloat("", price.Cryptsy.Usd),
 		"btc":         strconv.FormatFloat(price.Cryptsy.Btc, 'f', 8, 64),
-		"marketCap":   strconv.FormatFloat(marketCap, 'f', 2, 64),
+		"marketCap":   lib.RenderInteger("", int(marketCap)),
 		"change":      price.Cryptsy.PercentChange,
 		"changeStyle": changeStyle,
 
-		"hashRate":   network.HashRate,
-		"difficulty": network.Difficulty,
-		"mined":      network.Mined,
-		"remaining":  strconv.Itoa(remainingCoins),
+		"hashRate":   lib.RenderFloatFromString("", network.HashRate),
+		"difficulty": lib.RenderFloatFromString("", network.Difficulty),
+		"mined":      lib.RenderIntegerFromString("", network.Mined),
+		"remaining":  lib.RenderInteger("", remainingCoins),
 	}
 
 	return vars
