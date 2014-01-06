@@ -42,6 +42,30 @@ func (s *priceSuite) TestInserting(c *C) {
 	c.Check(newp.Cryptsy.Btc, Equals, 0.3456)
 }
 
+func (s *priceSuite) TestGettingPricesBetweenDates(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	baseTime := time.Now().UTC().Truncate(time.Minute)
+
+	p1 := &Price{UsdPerBtc: 99, GeneratedAt: baseTime}
+	p1.Insert(conn)
+
+	d, _ := time.ParseDuration("-24h")
+	p2 := &Price{UsdPerBtc: 98, GeneratedAt: baseTime.Add(d)}
+	p2.Insert(conn)
+
+	d, _ = time.ParseDuration("24h")
+	p3 := &Price{UsdPerBtc: 100, GeneratedAt: baseTime.Add(d)}
+	p3.Insert(conn)
+
+	prices, _ := GetPricesBetweenDates(conn, baseTime, p3.GeneratedAt)
+
+	c.Check(len(prices), Equals, 2)
+	c.Check(prices[0].UsdPerBtc, Equals, float64(99))
+	c.Check(prices[1].UsdPerBtc, Equals, float64(100))
+}
+
 func (s *priceSuite) TestSettingPercentChange(c *C) {
 	conn := CloneConnection()
 	defer conn.Close()
@@ -74,6 +98,67 @@ func (s *priceSuite) TestPercentChange(c *C) {
 	c.Check(percentChange(1, 5), Equals, "400.00")
 	c.Check(percentChange(3, 1.63), Equals, "-45.67")
 	c.Check(percentChange(0.456, 0.457), Equals, "0.22")
+}
+
+// -------------
+// Average model
+// -------------
+type averageSuite struct{}
+
+var _ = Suite(&averageSuite{})
+
+func (s *averageSuite) SetUpTest(c *C) {
+	config.LoadConfig("test")
+	ConnectToDB(config.String("database.host"), config.String("database.db"))
+	DropCollections()
+}
+
+func (s *averageSuite) TestInserting(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	t := time.Now().UTC()
+	a := &Average{TimeBlock: t, Cryptsy: &ExchangeAverage{Btc: 0.5}}
+	a.Insert(conn)
+
+	var avg Average
+	conn.DB.C(averageCollection).Find(bson.M{"timeBlock": t}).One(&avg)
+
+	c.Check(avg.Cryptsy.Btc, Equals, 0.5)
+}
+
+func (s *averageSuite) TestGeneratingAverages(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	baseTime := time.Now().UTC().Truncate(time.Minute * 10)
+	beginning := baseTime.Add(time.Minute * -10)
+	end := baseTime.Add(time.Minute*-1 + time.Second*59)
+
+	p1 := &Price{
+		UsdPerBtc: 100.0,
+		Cryptsy: &ExchangePrice{
+			Btc: 1.0,
+			Usd: 98.0,
+		},
+		GeneratedAt: beginning,
+	}
+	p1.Insert(conn)
+
+	p2 := &Price{
+		UsdPerBtc: 100.0,
+		Cryptsy: &ExchangePrice{
+			Btc: 3.0,
+			Usd: 100.0,
+		},
+		GeneratedAt: end,
+	}
+	p2.Insert(conn)
+
+	avg, _ := GenerateAverage(conn, beginning, end)
+
+	c.Check(avg.Cryptsy.Usd, Equals, float64(99))
+	c.Check(avg.Cryptsy.Btc, Equals, float64(2))
 }
 
 // -------------

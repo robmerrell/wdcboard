@@ -34,7 +34,7 @@ func (c *CoinPrice) Update() error {
 	price := &models.Price{
 		UsdPerBtc:   usd,
 		Cryptsy:     &models.ExchangePrice{Btc: cryptsyBtc, Usd: usd * cryptsyBtc},
-		GeneratedAt: time.Now().UTC(),
+		GeneratedAt: time.Now().UTC().Truncate(time.Minute),
 	}
 	if err := price.SetPercentChange(conn); err != nil {
 		return err

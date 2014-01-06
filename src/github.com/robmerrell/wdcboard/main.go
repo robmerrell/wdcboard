@@ -43,6 +43,11 @@ func main() {
 	updateCoinPrices.Documentation = cmds.UpdateCoinPricesDoc
 	bin.RegisterCommand(updateCoinPrices)
 
+	// pricing rollup for the graph
+	rollupPricing := comandante.NewCommand("pricing_rollup", "Aggregate pricing information", cmds.PricingRollupAction)
+	rollupPricing.Documentation = cmds.PricingRollupDoc
+	bin.RegisterCommand(rollupPricing)
+
 	// update network info
 	updateNetwork := comandante.NewCommand("update_network", "Get updated network information", cmds.UpdateAction(&updaters.Network{}))
 	updateNetwork.Documentation = cmds.UpdateCoinPricesDoc

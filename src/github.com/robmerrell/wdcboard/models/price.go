@@ -28,6 +28,13 @@ func GetLatestPrice(conn *MgoConnection) (*Price, error) {
 	return price, err
 }
 
+// GetPricesBetweenDates retrieves all of the prices between two dates, inclusively.
+func GetPricesBetweenDates(conn *MgoConnection, beginning, end time.Time) ([]*Price, error) {
+	var prices []*Price
+	err := conn.DB.C(priceCollection).Find(bson.M{"generatedAt": bson.M{"$gte": beginning, "$lte": end}}).Sort("_id").All(&prices)
+	return prices, err
+}
+
 // Insert saves a new WDC price point to the database.
 func (p *Price) Insert(conn *MgoConnection) error {
 	return conn.DB.C(priceCollection).Insert(p)
