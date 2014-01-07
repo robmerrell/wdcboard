@@ -2,3 +2,4 @@
 pkg/*
 *.swp
 src/github.com/robmerrell/wdcboard/wdcboard
+src/github.com/robmerrell/wdcboard/wdcboard-linux-*

@@ -19,5 +19,6 @@ func PricingRollupAction() error {
 	beginning := baseTime.Add(time.Minute * -10)
 	end := baseTime.Add(time.Minute*-1 + time.Second*59)
 
-	return models.GenerateAverage(conn, beginning, end)
+	_, err := models.GenerateAverage(conn, beginning, end)
+	return err
 }
