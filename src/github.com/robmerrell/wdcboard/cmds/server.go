@@ -72,7 +72,7 @@ func ServeAction() error {
 func generateTplVars(price *models.Price, network *models.Network) map[string]string {
 	// apply the necessary style for the percent change box
 	changeStyle := "percent-change-stat-up"
-	if string(price.Cryptsy.PercentChange[0]) == "-" {
+	if price.Cryptsy.PercentChange != "" && string(price.Cryptsy.PercentChange[0]) == "-" {
 		changeStyle = "percent-change-stat-down"
 	}
 
