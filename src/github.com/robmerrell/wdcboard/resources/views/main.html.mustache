@@ -70,7 +70,7 @@
 
       <section>
         <div class="section-title">24 HOURS</div>
-        <canvas id="priceChart"></canvas>
+        <div id="priceChart"></div>
       </section>
 
       <section>
@@ -153,6 +153,39 @@
     </div>
 
     
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.flot.min.js"></script>
+    <script src="/js/jquery.flot.time.min.js"></script>
+    <script>
+      $(function() {
+        var dataset = [{{averages}}];
 
+        var series = [{
+          data: dataset,
+          shadowSize: 0,
+          color: "#0263b0",
+          lines: {
+            fill: true
+          }
+        }];
+
+        loadPlot = function() {
+          $.plot("#priceChart", series, {
+            grid: {
+              borderWidth: 0
+            },
+            xaxis: {
+              mode: "time",
+              timeformat: ""
+            }
+          });        
+        }
+
+        loadPlot();
+        window.onresize = function(event) {
+          loadPlot();
+        }
+      });
+    </script>    
   </body>
 </html>

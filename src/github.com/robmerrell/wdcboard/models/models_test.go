@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/robmerrell/wdcboard/config"
 	"labix.org/v2/mgo/bson"
 	. "launchpad.net/gocheck"
@@ -160,6 +159,41 @@ func (s *averageSuite) TestGeneratingAverages(c *C) {
 
 	c.Check(avg.Cryptsy.Usd, Equals, float64(99))
 	c.Check(avg.Cryptsy.Btc, Equals, float64(2))
+}
+
+func (s *averageSuite) TestGettingAverages(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	baseTime := time.Now().UTC().Truncate(time.Minute * 10)
+	beginning := baseTime.Add(time.Minute * -10)
+	end := baseTime.Add(time.Minute*-1 + time.Second*59)
+
+	p1 := &Price{
+		UsdPerBtc: 100.0,
+		Cryptsy: &ExchangePrice{
+			Btc: 1.0,
+			Usd: 98.0,
+		},
+		GeneratedAt: beginning,
+	}
+	p1.Insert(conn)
+
+	p2 := &Price{
+		UsdPerBtc: 100.0,
+		Cryptsy: &ExchangePrice{
+			Btc: 3.0,
+			Usd: 100.0,
+		},
+		GeneratedAt: end,
+	}
+	p2.Insert(conn)
+
+	GenerateAverage(conn, beginning, end)
+	averages, _ := GetAverages(conn, 10)
+
+	c.Check(len(averages), Equals, 1)
+	c.Check(averages[0].Cryptsy.Usd, Equals, float64(99))
 }
 
 // -------------

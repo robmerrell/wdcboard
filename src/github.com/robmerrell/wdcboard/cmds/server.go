@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/hoisie/mustache"
 	"github.com/robmerrell/wdcboard/lib"
@@ -40,6 +41,12 @@ func ServeAction() error {
 		}
 
 		// get data for the graph
+		averages, err := models.GetAverages(conn, 24)
+		if err != nil {
+			webError(err, res)
+			return ""
+		}
+		parsedAverages := parseAverages(averages)
 
 		// get the forum posts
 
@@ -58,7 +65,7 @@ func ServeAction() error {
 		}
 
 		// generate the HTML
-		return mainView.Render(generateTplVars(price, network), map[string]interface{}{"posts": posts})
+		return mainView.Render(generateTplVars(price, network), map[string]interface{}{"posts": posts, "averages": parsedAverages})
 	})
 
 	// returns basic information about the state of the service. If any hardcoded checks fail
@@ -73,6 +80,7 @@ func ServeAction() error {
 	return nil
 }
 
+// generateTplVars generates a map to pass into the template
 func generateTplVars(price *models.Price, network *models.Network) map[string]string {
 	// apply the necessary style for the percent change box
 	changeStyle := "percent-change-stat-up"
@@ -101,4 +109,19 @@ func generateTplVars(price *models.Price, network *models.Network) map[string]st
 	}
 
 	return vars
+}
+
+// parseAverages takes a slice of averages and returns a string representation for flot to graph
+func parseAverages(averages []*models.Average) string {
+	parsed := ""
+	for i, average := range averages {
+		timeIndex := float64(average.TimeBlock.Unix()) * 1000.0
+		parsed += fmt.Sprintf("[%g, %.2f]", timeIndex, average.Cryptsy.Usd)
+
+		if i < len(averages) {
+			parsed += ","
+		}
+	}
+
+	return parsed
 }

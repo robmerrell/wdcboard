@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"labix.org/v2/mgo/bson"
 	"time"
 )
 
@@ -16,6 +18,17 @@ type Average struct {
 
 var averageCollection = "averages"
 
+// GetAverages returns the averages for the last n hours
+func GetAverages(conn *MgoConnection, hours int) ([]*Average, error) {
+	hoursDuration, _ := time.ParseDuration(fmt.Sprintf("-%dh", hours))
+	startTime := time.Now().UTC().Add(hoursDuration).Truncate(time.Minute * 10)
+
+	var results []*Average
+	err := conn.DB.C(averageCollection).Find(bson.M{"timeBlock": bson.M{"$gte": startTime}}).Sort("timeBlock").All(&results)
+	return results, err
+}
+
+// GenerateAverage generates the average data for prices between to times
 func GenerateAverage(conn *MgoConnection, startTime, endTime time.Time) (*Average, error) {
 	prices, err := GetPricesBetweenDates(conn, startTime, endTime)
 	if err != nil {

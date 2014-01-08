@@ -23,13 +23,6 @@ a {
   padding: 10px;
 }
 
-.theHeader {
-  background-color: black;
-  color: white;
-  font-size: 1.5em;
-  padding: 15px 0 15px 15px;
-}
-
 .section-title {
   background-color: #0263b0;
   color: white;
@@ -114,3 +107,7 @@ ul.news-body li {
   padding-bottom: 15px;
 }
 
+#priceChart {
+  height: 450px;
+  min-width: 200px;
+}
