@@ -13,3 +13,6 @@
 [submodule "src/github.com/hoisie/mustache"]
 	path = src/github.com/hoisie/mustache
 	url = git://github.com/hoisie/mustache.git
+[submodule "src/github.com/SlyMarbo/rss"]
+	path = src/github.com/SlyMarbo/rss
+	url = git://github.com/SlyMarbo/rss

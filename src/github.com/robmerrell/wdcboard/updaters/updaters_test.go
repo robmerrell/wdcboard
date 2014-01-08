@@ -174,3 +174,66 @@ func (s *networkSuite) TestNetworkCalls(c *C) {
 		c.Check(value, Equals, "915281")
 	})
 }
+
+// --------------------------
+// Tests for retrieving posts
+// --------------------------
+type postSuite struct {
+	redditServer1 *httptest.Server
+	redditServer2 *httptest.Server
+}
+
+var _ = Suite(&postSuite{})
+
+func (s *postSuite) SetUpSuite(c *C) {
+	s.redditServer1 = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := ` <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"> <channel> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> <description>worldcoin cryptocurrency</description> <image> <url>http://www.reddit.com/reddit.com.header.png</url> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> </image> <atom:link rel="self" href="http://www.reddit.com/r/worldcoin/.rss" type="application/rss+xml" /> <item> <title>two worldcoins?</title> <link>http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</link> <guid isPermaLink="true">http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</guid> <pubDate>Mon, 06 Jan 2014 14:29:39 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;Hi,&lt;/p&gt; &lt;p&gt;I like the look of WDC and have purchased a few and intend to get myself some more but Im a little confused with this site: &lt;a href=&#34;http://www.coinworld.org/&#34;&gt;http://www.coinworld.org/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;If I&amp;#39;m not mistaken this is another worldcoin?! That is surely not a good thing!&lt;/p&gt; &lt;p&gt;Cheers&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/smi2ler&#34;&gt; smi2ler &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/"&gt;[8 comments]&lt;/a&gt;</description> </item> <item> <title>Whats a better name than Scharmbeck?</title> <link>http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</link> <guid isPermaLink="true">http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</guid> <pubDate>Mon, 06 Jan 2014 10:32:36 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;This has been brought up before but I feel it needs more attention from the foundation. The name &amp;quot;Scharmbeck&amp;quot;, while giving off the vibe of a historical German bank is not catchy, memorable or modern. What do you redditors feel would be a better name? &lt;/p&gt; &lt;p&gt;Special thanks to the foundation for all the great work they have done so far. &lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/kanada_kid&#34;&gt; kanada_kid &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"&gt;[13 comments]&lt;/a&gt;</description> </item> </channel> </rss> `
+		fmt.Fprintln(w, res)
+	}))
+
+	s.redditServer2 = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := ` <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"> <channel> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> <description>worldcoin cryptocurrency</description> <image> <url>http://www.reddit.com/reddit.com.header.png</url> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> </image> <atom:link rel="self" href="http://www.reddit.com/r/worldcoin/.rss" type="application/rss+xml" /> <item> <title>two worldcoins?</title> <link>http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</link> <guid isPermaLink="true">firstguid</guid> <pubDate>Mon, 06 Jan 2014 14:29:39 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;Hi,&lt;/p&gt; &lt;p&gt;I like the look of WDC and have purchased a few and intend to get myself some more but Im a little confused with this site: &lt;a href=&#34;http://www.coinworld.org/&#34;&gt;http://www.coinworld.org/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;If I&amp;#39;m not mistaken this is another worldcoin?! That is surely not a good thing!&lt;/p&gt; &lt;p&gt;Cheers&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/smi2ler&#34;&gt; smi2ler &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/"&gt;[8 comments]&lt;/a&gt;</description> </item> <item> <title>Whats a better name than Scharmbeck?</title> <link>http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</link> <guid isPermaLink="true">secondguid</guid> <pubDate>Mon, 06 Jan 2014 10:32:36 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;This has been brought up before but I feel it needs more attention from the foundation. The name &amp;quot;Scharmbeck&amp;quot;, while giving off the vibe of a historical German bank is not catchy, memorable or modern. What do you redditors feel would be a better name? &lt;/p&gt; &lt;p&gt;Special thanks to the foundation for all the great work they have done so far. &lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/kanada_kid&#34;&gt; kanada_kid &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"&gt;[13 comments]&lt;/a&gt;</description> </item> </channel> </rss> `
+		fmt.Fprintln(w, res)
+	}))
+}
+
+func (s *postSuite) SetUpTest(c *C) {
+	config.LoadConfig("test")
+	models.ConnectToDB(config.String("database.host"), config.String("database.db"))
+	models.DropCollections()
+}
+
+func (s *postSuite) TearDownSuite(c *C) {
+	s.redditServer1.Close()
+	s.redditServer2.Close()
+}
+
+func (s *postSuite) TestGettingReditPosts(c *C) {
+	conn := models.CloneConnection()
+	defer conn.Close()
+
+	replaceUrl(s.redditServer1.URL, &subredditUrl, func() {
+		p1 := &models.Post{Title: "test title", Url: "test url", Source: "reddit", UniqueId: "http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"}
+		p1.Insert(conn)
+
+		posts, _ := getNewRedditPosts()
+
+		c.Check(len(posts), Equals, 1)
+		c.Check(posts[0].Title, Equals, "two worldcoins?")
+	})
+}
+
+func (s *postSuite) TestUpdatingReddit(c *C) {
+	conn := models.CloneConnection()
+	defer conn.Close()
+
+	replaceUrl(s.redditServer2.URL, &subredditUrl, func() {
+		r := &Reddit{}
+		r.Update()
+
+		var results []*models.Post
+		conn.DB.C("posts").Find(bson.M{}).All(&results)
+
+		c.Check(len(results), Equals, 2)
+	})
+}

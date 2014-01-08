@@ -56,6 +56,9 @@ func main() {
 	// update forum posts
 
 	// update reddit stories
+	updateReddit := comandante.NewCommand("update_reddit", "Get new /r/worldcoin posts", cmds.UpdateAction(&updaters.Reddit{}))
+	updateReddit.Documentation = cmds.UpdateRedditDoc
+	bin.RegisterCommand(updateReddit)
 
 	// run web service
 	webService := comandante.NewCommand("serve", "Start the WDCBoard web server", cmds.ServeAction)

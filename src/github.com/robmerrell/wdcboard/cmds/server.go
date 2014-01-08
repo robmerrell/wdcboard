@@ -44,6 +44,11 @@ func ServeAction() error {
 		// get the forum posts
 
 		// get reddit posts
+		posts, err := models.GetLatestPosts(conn, "reddit", 5)
+		if err != nil {
+			webError(err, res)
+			return ""
+		}
 
 		// get the mining information
 		network, err := models.GetLatestNetworkSnapshot(conn)
@@ -53,8 +58,7 @@ func ServeAction() error {
 		}
 
 		// generate the HTML
-
-		return mainView.Render(generateTplVars(price, network))
+		return mainView.Render(generateTplVars(price, network), map[string]interface{}{"posts": posts})
 	})
 
 	// returns basic information about the state of the service. If any hardcoded checks fail

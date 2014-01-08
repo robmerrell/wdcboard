@@ -65,7 +65,7 @@ func DropCollections() {
 	conn := CloneConnection()
 	defer conn.Close()
 
-	collections := []string{priceCollection, networkCollection}
+	collections := []string{priceCollection, networkCollection, postCollection, averageCollection}
 	for _, collection := range collections {
 		conn.DB.C(collection).DropCollection()
 	}

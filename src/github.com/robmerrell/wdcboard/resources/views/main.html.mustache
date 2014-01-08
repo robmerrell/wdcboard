@@ -81,11 +81,7 @@
               Worldcoin Forum
             </div>
             <ul class="news-body">
-              <li><a href="http://worldcoinforum.org/topic/852-exposing-the-worldcoin-scam/">"Exposing the WorldCoin scam?"</a></li>
-              <li><a href="http://worldcoinforum.org/topic/951-new-wallet-translate-mistake/">New Wallet Translate Mistake</a></li>
-              <li><a href="http://worldcoinforum.org/topic/971-worldcoin-video-chat-irc/">WorldCoin Video Chat + IRC</a></li>
-              <li><a href="http://worldcoinforum.org/topic/628-solution-to-slow-initial-blockchain-sync/">SOLUTION TO SLOW INITIAL BLOCKCHAIN SYNC</a></li>
-              <li><a href="http://worldcoinforum.org/topic/967-why-the-worldcoin-dont-create-block-at-my-pool-when-run-half-day/">why the worldcoin don't create block at my pool when run half day?</a></li>
+            <li>Nothing here yet :(</li>
             </ul>
           </div>
 
@@ -94,11 +90,9 @@
               /r/worldcoin
             </div>
             <ul class="news-body">
-              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tm13z/where_can_i_buy_wdc/">Where can I buy WDC</a></li>
-              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tklxp/paper_wallet_generator_secure/">Paper Wallet Generator Secure?</a></li>
-              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tjdz1/started_putting_together_some_css_for_rworldcoin/">Started putting together some CSS for /r/Worldcoin. Check it out.</a></li>
-              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tjh59/cryptowisdom_keeps_you_up_to_date_with_the_latest/">CryptoWisdom keeps you up to date with the latest Cryptocurrency and Mining News!</a></li>
-              <li><a href="http://www.reddit.com/r/worldcoin/comments/1tk953/what_value_do_you_think_a_single_worldcoin_would/">What value do you think a single Worldcoin would have to be to be useful in everyday purchases?</a></li>
+              {{#posts}}
+                <li><a href="{{Url}}">{{Title}}</a></li>
+              {{/posts}}
             </ul>
           </div>
         </div>
@@ -158,53 +152,7 @@
       </section>
     </div>
 
-    <script src="/js/chart.min.js"></script>
-    <script>
-      // load the chart
-      var ctx = document.getElementById("priceChart").getContext("2d");
-      var data = {
-        labels : ["0:00am", "3:00am", "6:00am", "9:00am", "12:00pm", "3:00pm", "6:00pm", "9:00pm"],
-        datasets : [
-          {
-            fillColor : "rgba(2,99,176,0.5)",
-            strokeColor : "rgba(2,99,176,1)",
-            pointColor : "rgba(151,187,205,1)",
-            pointStrokeColor : "#fff",
-            data : [0.38,0.37,0.39,0.40,0.41,0.39,0.38,0.41]
-          }
-        ]
-      };
-      var max = 0.41;
-      var steps = 0.02;
-      var options = {
-        bezierCurve: false,
-        scaleOverride: true,
-        scaleOverlay: true,
-        scaleSteps: 5,
-        scaleStepWidth: 0.05,
-        scaleStartValue: 0.27
-      };
-
-      function resizeChart() {
-          var canvas = document.getElementById("priceChart");
-
-          //set new sizes                 
-          var new_canvasWidth = Math.max((canvas.parentNode.clientWidth), 200);
-          var new_canvasHeight = 450;
-
-          //only redraw if the size  has changed
-          if ((new_canvasWidth != canvas.width) || (new_canvasHeight != canvas.height)) {
-              canvas.width = new_canvasWidth;
-              canvas.height = new_canvasHeight;
-              new Chart(canvas.getContext("2d")).Line(data, options);
-          }
-      }
-      //resizeTracker, clearTimeout, and setTimeout are used to only fire the resize event after the user has finished resizing; rather than firing lots of times unnecessarily while resizing.
-      var resizeTracker;
-      window.addEventListener('resize', (function(){clearTimeout(resizeTracker);resizeTracker = setTimeout(resizeChart, 100);}), false);
-      resizeChart();
-      
-    </script>
+    
 
   </body>
 </html>

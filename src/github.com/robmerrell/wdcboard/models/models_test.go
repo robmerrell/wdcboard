@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/robmerrell/wdcboard/config"
 	"labix.org/v2/mgo/bson"
 	. "launchpad.net/gocheck"
@@ -185,4 +186,68 @@ func (s *networkSuite) TestInserting(c *C) {
 	conn.DB.C(networkCollection).Find(bson.M{"hashRate": "100.0"}).One(&info)
 
 	c.Check(info.Mined, Equals, "1234")
+}
+
+// -----------
+// Posts model
+// -----------
+type postSuite struct{}
+
+var _ = Suite(&postSuite{})
+
+func (s *postSuite) SetUpTest(c *C) {
+	config.LoadConfig("test")
+	ConnectToDB(config.String("database.host"), config.String("database.db"))
+	DropCollections()
+}
+
+func (s *postSuite) TestInserting(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	p := &Post{Title: "test title", Url: "test url"}
+	p.Insert(conn)
+
+	var info Post
+	conn.DB.C(postCollection).Find(bson.M{"title": "test title"}).One(&info)
+
+	c.Check(info.Url, Equals, "test url")
+}
+
+func (s *postSuite) TestPostExists(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	p := &Post{Title: "test title", Url: "test url", UniqueId: "test id"}
+	p.Insert(conn)
+
+	exists, _ := PostExists(conn, "test id")
+	c.Check(exists, Equals, true)
+}
+
+func (s *postSuite) TestGettingLatestPosts(c *C) {
+	conn := CloneConnection()
+	defer conn.Close()
+
+	t1 := time.Now().UTC().Add(time.Hour * -10)
+	t2 := time.Now().UTC()
+	t3 := time.Now().UTC().Add(time.Hour * -100)
+
+	p1 := &Post{Title: "test title", Url: "test url", Source: "reddit", PublishedAt: t1}
+	p1.Insert(conn)
+
+	p2 := &Post{Title: "test title2", Url: "test url2", Source: "reddit", PublishedAt: t2}
+	p2.Insert(conn)
+
+	p3 := &Post{Title: "test title3", Url: "test url3", Source: "reddit", PublishedAt: t3}
+	p3.Insert(conn)
+
+	p4 := &Post{Title: "test different source", Url: "test url2", Source: "somethingelse"}
+	p4.Insert(conn)
+
+	posts, _ := GetLatestPosts(conn, "reddit", 2)
+
+	c.Check(len(posts), Equals, 2)
+	c.Check(posts[0].Title, Equals, "test title2")
+	c.Check(posts[1].Title, Equals, "test title")
 }

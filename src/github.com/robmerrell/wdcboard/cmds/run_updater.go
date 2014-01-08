@@ -12,6 +12,10 @@ var UpdateNetworkDoc = `
 Get updated information about the Worldcoin network.
 `
 
+var UpdateRedditDoc = `
+Get new posts from /r/worldcoin
+`
+
 // UpdateAction returns a function that invokes an updaters Update method
 // to be used by comandante.
 func UpdateAction(updater updaters.Updater) func() error {
