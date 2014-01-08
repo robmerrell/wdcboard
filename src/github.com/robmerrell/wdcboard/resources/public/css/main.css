@@ -111,3 +111,8 @@ ul.news-body li {
   height: 450px;
   min-width: 200px;
 }
+
+footer {
+  padding: 20px 0;
+  text-align: center;
+}
