@@ -14,9 +14,11 @@ type ExchangePrice struct {
 }
 
 type Price struct {
-	UsdPerBtc   float64        "usdperbtc"
-	Cryptsy     *ExchangePrice "cryptsy"
-	GeneratedAt time.Time      "generatedAt"
+	Id               bson.ObjectId  "_id,omitempty"
+	UsdPerBtc        float64        "usdperbtc"
+	Cryptsy          *ExchangePrice "cryptsy"
+	GeneratedAt      time.Time      "generatedAt"
+	ChangeComparison bson.ObjectId  "changeComparison,omitempty"
 }
 
 var priceCollection = "prices"
@@ -37,6 +39,7 @@ func GetPricesBetweenDates(conn *MgoConnection, beginning, end time.Time) ([]*Pr
 
 // Insert saves a new WDC price point to the database.
 func (p *Price) Insert(conn *MgoConnection) error {
+	p.Id = bson.NewObjectId()
 	return conn.DB.C(priceCollection).Insert(p)
 }
 
@@ -56,6 +59,7 @@ func (p *Price) SetPercentChange(conn *MgoConnection) error {
 	}
 
 	p.Cryptsy.PercentChange = percentChange(oldPrice.Cryptsy.Btc, p.Cryptsy.Btc)
+	p.ChangeComparison = oldPrice.Id
 
 	return nil
 }

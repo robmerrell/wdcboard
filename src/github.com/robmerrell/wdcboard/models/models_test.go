@@ -91,6 +91,7 @@ func (s *priceSuite) TestSettingPercentChange(c *C) {
 	p2.SetPercentChange(conn)
 
 	c.Check(p2.Cryptsy.PercentChange, Equals, "59.14")
+	c.Check(p2.ChangeComparison, Equals, p1.Id)
 }
 
 func (s *priceSuite) TestPercentChange(c *C) {
