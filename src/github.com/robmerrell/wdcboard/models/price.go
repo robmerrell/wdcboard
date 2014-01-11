@@ -47,7 +47,7 @@ func (p *Price) SetPercentChange(conn *MgoConnection) error {
 
 	// find the record closest to 24 hours as possible
 	var oldPrice Price
-	if err := conn.DB.C(priceCollection).Find(bson.M{"generatedAt": bson.M{"$lte": previousTime}}).One(&oldPrice); err != nil {
+	if err := conn.DB.C(priceCollection).Find(bson.M{"generatedAt": bson.M{"$lte": previousTime}}).Sort("-_id").One(&oldPrice); err != nil {
 		if err == mgo.ErrNotFound {
 			return nil
 		} else {
