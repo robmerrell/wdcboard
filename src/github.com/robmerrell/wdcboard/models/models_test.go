@@ -76,6 +76,7 @@ func (s *priceSuite) TestSettingPercentChange(c *C) {
 		UsdPerBtc: 100.0,
 		Cryptsy: &ExchangePrice{
 			Btc: 0.3456,
+			Usd: 1.0,
 		},
 		GeneratedAt: time.Now().UTC().Add(yesterdayDuration),
 	}
@@ -85,12 +86,13 @@ func (s *priceSuite) TestSettingPercentChange(c *C) {
 		UsdPerBtc: 100.0,
 		Cryptsy: &ExchangePrice{
 			Btc: 0.55,
+			Usd: 1.45,
 		},
 		GeneratedAt: time.Now().UTC(),
 	}
 	p2.SetPercentChange(conn)
 
-	c.Check(p2.Cryptsy.PercentChange, Equals, "59.14")
+	c.Check(p2.Cryptsy.PercentChange, Equals, "45.00")
 	c.Check(p2.ChangeComparison, Equals, p1.Id)
 }
 

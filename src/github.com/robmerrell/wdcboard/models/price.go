@@ -58,20 +58,20 @@ func (p *Price) SetPercentChange(conn *MgoConnection) error {
 		}
 	}
 
-	p.Cryptsy.PercentChange = percentChange(oldPrice.Cryptsy.Btc, p.Cryptsy.Btc)
+	p.Cryptsy.PercentChange = percentChange(oldPrice.Cryptsy.Usd, p.Cryptsy.Usd)
 	p.ChangeComparison = oldPrice.Id
 
 	return nil
 }
 
 // percentChange calculates the percent change between to BTC values.
-func percentChange(oldBtc, newBtc float64) string {
+func percentChange(oldUsd, newUsd float64) string {
 	var change float64
-	if oldBtc == 0.0 {
+	if oldUsd == 0.0 {
 		change = 100.0
 	} else {
-		diff := newBtc - oldBtc
-		change = (diff / oldBtc) * 100
+		diff := (newUsd - oldUsd)
+		change = (diff / oldUsd) * 100
 	}
 
 	return fmt.Sprintf("%.2f", change)
