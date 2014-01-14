@@ -11,7 +11,6 @@ import (
 
 var coinbaseUrl = "https://coinbase.com/api/v1/currencies/exchange_rates"
 var cryptsyUrl = "http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14"
-var tickerUrl = "https://btc-e.com/api/2/wdc_%s/ticker"
 
 type CoinPrice struct{}
 

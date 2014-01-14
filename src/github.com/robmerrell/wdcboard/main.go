@@ -54,6 +54,9 @@ func main() {
 	bin.RegisterCommand(updateNetwork)
 
 	// update forum posts
+	updateForum := comandante.NewCommand("update_forum", "Get new forum topics", cmds.UpdateAction(&updaters.Forum{}))
+	updateForum.Documentation = cmds.UpdateForumDoc
+	bin.RegisterCommand(updateForum)
 
 	// update reddit stories
 	updateReddit := comandante.NewCommand("update_reddit", "Get new /r/worldcoin posts", cmds.UpdateAction(&updaters.Reddit{}))

@@ -49,9 +49,14 @@ func ServeAction() error {
 		parsedAverages := parseAverages(averages)
 
 		// get the forum posts
+		forum, err := models.GetLatestPosts(conn, "forum", 8)
+		if err != nil {
+			webError(err, res)
+			return ""
+		}
 
 		// get reddit posts
-		posts, err := models.GetLatestPosts(conn, "reddit", 5)
+		reddit, err := models.GetLatestPosts(conn, "reddit", 8)
 		if err != nil {
 			webError(err, res)
 			return ""
@@ -65,7 +70,8 @@ func ServeAction() error {
 		}
 
 		// generate the HTML
-		return mainView.Render(generateTplVars(price, network), map[string]interface{}{"posts": posts, "averages": parsedAverages})
+		valueMap := map[string]interface{}{"reddit": reddit, "forum": forum, "averages": parsedAverages}
+		return mainView.Render(generateTplVars(price, network), valueMap)
 	})
 
 	// returns basic information about the state of the service. If any hardcoded checks fail

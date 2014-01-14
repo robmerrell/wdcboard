@@ -16,6 +16,10 @@ var UpdateRedditDoc = `
 Get new posts from /r/worldcoin
 `
 
+var UpdateForumDoc = `
+Get new forum topics from "WorldCoin Discussion" and "Promotion of WorldCoin" at worldcoinforum.org
+`
+
 // UpdateAction returns a function that invokes an updaters Update method
 // to be used by comandante.
 func UpdateAction(updater updaters.Updater) func() error {

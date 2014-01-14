@@ -81,7 +81,9 @@
               Worldcoin Forum
             </div>
             <ul class="news-body">
-            <li>Nothing here yet :(</li>
+              {{#forum}}
+                <li><a href="{{Url}}">{{Title}}</a></li>
+              {{/forum}}
             </ul>
           </div>
 
@@ -90,9 +92,9 @@
               /r/worldcoin
             </div>
             <ul class="news-body">
-              {{#posts}}
+              {{#reddit}}
                 <li><a href="{{Url}}">{{Title}}</a></li>
-              {{/posts}}
+              {{/reddit}}
             </ul>
           </div>
         </div>

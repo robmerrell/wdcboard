@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 // Hook up gocheck into the "go test" runner.
@@ -179,21 +180,67 @@ func (s *networkSuite) TestNetworkCalls(c *C) {
 // Tests for retrieving posts
 // --------------------------
 type postSuite struct {
-	redditServer1 *httptest.Server
-	redditServer2 *httptest.Server
+	redditServer1    *httptest.Server
+	redditServer2    *httptest.Server
+	forumListServer  *httptest.Server
+	forumTopicServer *httptest.Server
 }
 
 var _ = Suite(&postSuite{})
 
 func (s *postSuite) SetUpSuite(c *C) {
 	s.redditServer1 = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := ` <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"> <channel> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> <description>worldcoin cryptocurrency</description> <image> <url>http://www.reddit.com/reddit.com.header.png</url> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> </image> <atom:link rel="self" href="http://www.reddit.com/r/worldcoin/.rss" type="application/rss+xml" /> <item> <title>two worldcoins?</title> <link>http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</link> <guid isPermaLink="true">http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</guid> <pubDate>Mon, 06 Jan 2014 14:29:39 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;Hi,&lt;/p&gt; &lt;p&gt;I like the look of WDC and have purchased a few and intend to get myself some more but Im a little confused with this site: &lt;a href=&#34;http://www.coinworld.org/&#34;&gt;http://www.coinworld.org/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;If I&amp;#39;m not mistaken this is another worldcoin?! That is surely not a good thing!&lt;/p&gt; &lt;p&gt;Cheers&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/smi2ler&#34;&gt; smi2ler &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/"&gt;[8 comments]&lt;/a&gt;</description> </item> <item> <title>Whats a better name than Scharmbeck?</title> <link>http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</link> <guid isPermaLink="true">http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</guid> <pubDate>Mon, 06 Jan 2014 10:32:36 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;This has been brought up before but I feel it needs more attention from the foundation. The name &amp;quot;Scharmbeck&amp;quot;, while giving off the vibe of a historical German bank is not catchy, memorable or modern. What do you redditors feel would be a better name? &lt;/p&gt; &lt;p&gt;Special thanks to the foundation for all the great work they have done so far. &lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/kanada_kid&#34;&gt; kanada_kid &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"&gt;[13 comments]&lt;/a&gt;</description> </item> </channel> </rss> `
+		res := `<?xml version="1.0" encoding="UTF-8"?> <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"> <channel> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> <description>worldcoin cryptocurrency</description> <image> <url>http://www.reddit.com/reddit.com.header.png</url> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> </image> <atom:link rel="self" href="http://www.reddit.com/r/worldcoin/.rss" type="application/rss+xml" /> <item> <title>two worldcoins?</title> <link>http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</link> <guid isPermaLink="true">http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</guid> <pubDate>Mon, 06 Jan 2014 14:29:39 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;Hi,&lt;/p&gt; &lt;p&gt;I like the look of WDC and have purchased a few and intend to get myself some more but Im a little confused with this site: &lt;a href=&#34;http://www.coinworld.org/&#34;&gt;http://www.coinworld.org/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;If I&amp;#39;m not mistaken this is another worldcoin?! That is surely not a good thing!&lt;/p&gt; &lt;p&gt;Cheers&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/smi2ler&#34;&gt; smi2ler &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/"&gt;[8 comments]&lt;/a&gt;</description> </item> <item> <title>Whats a better name than Scharmbeck?</title> <link>http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</link> <guid isPermaLink="true">http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</guid> <pubDate>Mon, 06 Jan 2014 10:32:36 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;This has been brought up before but I feel it needs more attention from the foundation. The name &amp;quot;Scharmbeck&amp;quot;, while giving off the vibe of a historical German bank is not catchy, memorable or modern. What do you redditors feel would be a better name? &lt;/p&gt; &lt;p&gt;Special thanks to the foundation for all the great work they have done so far. &lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/kanada_kid&#34;&gt; kanada_kid &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"&gt;[13 comments]&lt;/a&gt;</description> </item> </channel> </rss>`
 		fmt.Fprintln(w, res)
 	}))
 
 	s.redditServer2 = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := ` <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"> <channel> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> <description>worldcoin cryptocurrency</description> <image> <url>http://www.reddit.com/reddit.com.header.png</url> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> </image> <atom:link rel="self" href="http://www.reddit.com/r/worldcoin/.rss" type="application/rss+xml" /> <item> <title>two worldcoins?</title> <link>http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</link> <guid isPermaLink="true">firstguid</guid> <pubDate>Mon, 06 Jan 2014 14:29:39 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;Hi,&lt;/p&gt; &lt;p&gt;I like the look of WDC and have purchased a few and intend to get myself some more but Im a little confused with this site: &lt;a href=&#34;http://www.coinworld.org/&#34;&gt;http://www.coinworld.org/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;If I&amp;#39;m not mistaken this is another worldcoin?! That is surely not a good thing!&lt;/p&gt; &lt;p&gt;Cheers&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/smi2ler&#34;&gt; smi2ler &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/"&gt;[8 comments]&lt;/a&gt;</description> </item> <item> <title>Whats a better name than Scharmbeck?</title> <link>http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</link> <guid isPermaLink="true">secondguid</guid> <pubDate>Mon, 06 Jan 2014 10:32:36 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;This has been brought up before but I feel it needs more attention from the foundation. The name &amp;quot;Scharmbeck&amp;quot;, while giving off the vibe of a historical German bank is not catchy, memorable or modern. What do you redditors feel would be a better name? &lt;/p&gt; &lt;p&gt;Special thanks to the foundation for all the great work they have done so far. &lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/kanada_kid&#34;&gt; kanada_kid &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"&gt;[13 comments]&lt;/a&gt;</description> </item> </channel> </rss> `
+		res := `<?xml version="1.0" encoding="UTF-8"?> <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"> <channel> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> <description>worldcoin cryptocurrency</description> <image> <url>http://www.reddit.com/reddit.com.header.png</url> <title>worldcoin cryptocurrency</title> <link>http://www.reddit.com/r/worldcoin/</link> </image> <atom:link rel="self" href="http://www.reddit.com/r/worldcoin/.rss" type="application/rss+xml" /> <item> <title>two worldcoins?</title> <link>http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/</link> <guid isPermaLink="true">firstguid</guid> <pubDate>Mon, 06 Jan 2014 14:29:39 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;Hi,&lt;/p&gt; &lt;p&gt;I like the look of WDC and have purchased a few and intend to get myself some more but Im a little confused with this site: &lt;a href=&#34;http://www.coinworld.org/&#34;&gt;http://www.coinworld.org/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;If I&amp;#39;m not mistaken this is another worldcoin?! That is surely not a good thing!&lt;/p&gt; &lt;p&gt;Cheers&lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/smi2ler&#34;&gt; smi2ler &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1ujf68/two_worldcoins/"&gt;[8 comments]&lt;/a&gt;</description> </item> <item> <title>Whats a better name than Scharmbeck?</title> <link>http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/</link> <guid isPermaLink="true">secondguid</guid> <pubDate>Mon, 06 Jan 2014 10:32:36 +0000</pubDate> <description>&lt;!-- SC_OFF --&gt;&lt;div class=&#34;md&#34;&gt;&lt;p&gt;This has been brought up before but I feel it needs more attention from the foundation. The name &amp;quot;Scharmbeck&amp;quot;, while giving off the vibe of a historical German bank is not catchy, memorable or modern. What do you redditors feel would be a better name? &lt;/p&gt; &lt;p&gt;Special thanks to the foundation for all the great work they have done so far. &lt;/p&gt; &lt;/div&gt;&lt;!-- SC_ON --&gt; submitted by &lt;a href=&#34;http://www.reddit.com/user/kanada_kid&#34;&gt; kanada_kid &lt;/a&gt; &lt;br/&gt; &lt;a href=&#34;http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/&#34;&gt;[link]&lt;/a&gt; &lt;a href="http://www.reddit.com/r/worldcoin/comments/1uj486/whats_a_better_name_than_scharmbeck/"&gt;[13 comments]&lt;/a&gt;</description> </item> </channel> </rss>`
 		fmt.Fprintln(w, res)
+	}))
+
+	s.forumListServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		posts := `
+		<html>
+		<body>
+		<table>
+		<tr itemtype='http://schema.org/Article'>
+			<td>
+				<span>Pinned</span>
+			</td>
+		</tr>
+		<tr itemtype='http://schema.org/Article'>
+			<td>
+				<span itemprop='name'>Title1</span>
+				<a itemprop='url' href='%s'>url</a>
+			</td>
+		</tr>
+		<tr itemtype='http://schema.org/Article'>
+			<td>
+				<span itemprop='name'>Title2</span>
+				<a itemprop='url' href='%s'>url2</a>
+			</td>
+		</tr>	
+		</table>	
+		</body>
+		</html>
+		`
+
+		fmt.Fprintln(w, fmt.Sprintf(posts, s.forumTopicServer.URL, s.forumTopicServer.URL))
+	}))
+
+	s.forumTopicServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		topic := `
+		<html>
+		<body>
+		<div id='ips_Posts'>
+			<div><abbr itemprop='commentTime' title='2014-01-13T17:33:05+00:00'></abbr></div>
+			<div><abbr itemprop='commentTime' title='2014-01-14T17:33:05+00:00'></abbr></div>
+		</div>
+		</body>
+		</html>
+		`
+		fmt.Fprintln(w, topic)
 	}))
 }
 
@@ -206,6 +253,8 @@ func (s *postSuite) SetUpTest(c *C) {
 func (s *postSuite) TearDownSuite(c *C) {
 	s.redditServer1.Close()
 	s.redditServer2.Close()
+	s.forumListServer.Close()
+	s.forumTopicServer.Close()
 }
 
 func (s *postSuite) TestGettingReditPosts(c *C) {
@@ -235,5 +284,18 @@ func (s *postSuite) TestUpdatingReddit(c *C) {
 		conn.DB.C("posts").Find(bson.M{}).All(&results)
 
 		c.Check(len(results), Equals, 2)
+	})
+}
+
+func (s *postSuite) TestUpdateForum(c *C) {
+	replaceUrl(s.forumListServer.URL, &forumBaseUrl, func() {
+		posts, _ := getNewTopicsFromForum("testing")
+
+		c.Check(len(posts), Equals, 2)
+		c.Check(posts[0].Title, Equals, "Title1")
+		c.Check(posts[1].Title, Equals, "Title2")
+
+		parsedTime, _ := time.Parse("2006-01-02T15:04:05-07:00", "2014-01-13T17:33:05+00:00")
+		c.Check(posts[0].PublishedAt.Format(time.RFC3339), Equals, parsedTime.Format(time.RFC3339))
 	})
 }

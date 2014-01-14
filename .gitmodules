@@ -16,3 +16,6 @@
 [submodule "src/github.com/SlyMarbo/rss"]
 	path = src/github.com/SlyMarbo/rss
 	url = git://github.com/SlyMarbo/rss
+[submodule "src/github.com/PuerkitoBio/goquery"]
+	path = src/github.com/PuerkitoBio/goquery
+	url = git://github.com/PuerkitoBio/goquery.git
