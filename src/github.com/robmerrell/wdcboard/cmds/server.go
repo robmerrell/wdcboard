@@ -1,14 +1,17 @@
 package cmds
 
 import (
+	"errors"
 	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/hoisie/mustache"
 	"github.com/robmerrell/wdcboard/lib"
 	"github.com/robmerrell/wdcboard/models"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 var ServerDoc = `
@@ -77,7 +80,36 @@ func ServeAction() error {
 	// returns basic information about the state of the service. If any hardcoded checks fail
 	// the message is returned with a 500 status. We can then use pingdom or another service
 	// to alert when data integrity may be off.
-	m.Get("/health", func() string {
+	m.Get("/health", func(res http.ResponseWriter) string {
+		conn := models.CloneConnection()
+		defer conn.Close()
+
+		twoHoursAgo := time.Now().Add(time.Hour * -2).Unix()
+
+		// make sure the price has been updated in the last 2 hours
+		price, err := models.GetLatestPrice(conn)
+		if err != nil {
+			webError(err, res)
+			return ""
+		}
+
+		if price.GeneratedAt.Unix() < twoHoursAgo {
+			webError(errors.New("The latest price is old"), res)
+			return ""
+		}
+
+		// make sure the network has been updated in the last two hours
+		network, err := models.GetLatestNetworkSnapshot(conn)
+		if err != nil {
+			webError(err, res)
+			return ""
+		}
+
+		if network.GeneratedAt.Unix() < twoHoursAgo {
+			webError(errors.New("The latest network snapshot is old"), res)
+			return ""
+		}
+
 		return "ok"
 	})
 
@@ -121,6 +153,10 @@ func generateTplVars(price *models.Price, network *models.Network) map[string]st
 func parseAverages(averages []*models.Average) string {
 	parsed := ""
 	for i, average := range averages {
+		if math.IsNaN(average.Cryptsy.Usd) {
+			continue
+		}
+
 		timeIndex := float64(average.TimeBlock.Unix()) * 1000.0
 		parsed += fmt.Sprintf("[%g, %.2f]", timeIndex, average.Cryptsy.Usd)
 
