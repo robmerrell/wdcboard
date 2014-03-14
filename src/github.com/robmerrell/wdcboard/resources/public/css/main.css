@@ -32,6 +32,10 @@ a {
   padding: 10px;
 }
 
+.warning {
+  color: red;  
+  text-align: center;
+}
 
 /*********** HEADER ************/
 
