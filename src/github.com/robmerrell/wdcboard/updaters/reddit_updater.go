@@ -5,7 +5,7 @@ import (
 	"github.com/robmerrell/wdcboard/models"
 )
 
-var subredditUrl = "http://www.reddit.com/r/worldcoin/.rss"
+var subredditUrl = "http://www.reddit.com/r/worldcoinalliance/.rss"
 
 type Reddit struct{}
 
